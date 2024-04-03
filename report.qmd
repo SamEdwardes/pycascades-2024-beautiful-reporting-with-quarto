@@ -1,0 +1,33 @@
+---
+title: Posit Connect - Deployment Report
+format:
+  html:
+    code-fold: true
+    code-tools: false
+    toc: true
+    toc-location: left
+    other-links:
+      - text: Report Source Code (GitHub)
+        href: https://github.com/SamEdwardes/pycascades-2024-beautiful-reporting-with-quarto
+      - text: Quarto Docs
+        href: https://quarto.org
+  typst:
+    toc: true
+  docx:
+    toc: true
+    number-sections: true
+    highlight-style: github
+---
+
+```{python setup}
+#| output: false
+import pandas as pd
+import plotly.express as px
+import httpx
+```
+
+This report was run as of XX.
+
+```{python}
+print("Hello world!")
+```
