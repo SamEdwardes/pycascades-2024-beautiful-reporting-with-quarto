@@ -12,7 +12,7 @@ open:
     open output/report.html
 
 uv:
-    uv pip compile requirements.in -q -o requirements.txt && uv pip sync requirements.txt
+    uv pip compile requirements.in --quiet --output-file requirements.txt && uv pip sync requirements.txt
 
 clean:
     rm output/report.html
