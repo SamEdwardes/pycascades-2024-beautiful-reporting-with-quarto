@@ -2,3 +2,7 @@ pandas
 plotly
 httpx
 jupyter
+itables
+kaleido
+tabulate
+pydantic-settings

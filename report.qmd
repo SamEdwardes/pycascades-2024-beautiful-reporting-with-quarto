@@ -1,9 +1,11 @@
 ---
-title: Posit Connect - Deployment Report
+title: Posit Connect Deployment Report
+execute:
+  echo: false # hide or show the source code.
 format:
   html:
     code-fold: true
-    code-tools: false
+    code-tools: true
     toc: true
     toc-location: left
     other-links:
@@ -11,23 +13,256 @@ format:
         href: https://github.com/SamEdwardes/pycascades-2024-beautiful-reporting-with-quarto
       - text: Quarto Docs
         href: https://quarto.org
-  typst:
+  pdf:
     toc: true
+    execute:
+      echo: false # always hide the code for PDF outputs.
   docx:
     toc: true
     number-sections: true
     highlight-style: github
+    execute:
+      echo: false # always hide the code for Word outputs.
+  ipynb: default
 ---
 
 ```{python setup}
-#| output: false
+# Import libraries
+import datetime
+import os
+
+import httpx
 import pandas as pd
 import plotly.express as px
-import httpx
+import pytz
+from tabulate import tabulate
+from itables import show
+from IPython.display import Image, Markdown
+from plotly.graph_objs import Figure
+from pydantic_settings import BaseSettings, SettingsConfigDict
 ```
 
-This report was run as of XX.
+```{python base parameters}
+# Get current date and time
+today = datetime.datetime.now(pytz.timezone('America/Vancouver'))
+
+# Connect API params
+class Settings(BaseSettings):
+    connect_server_url: str
+    connect_api_key: str
+    quarto_python: str
+    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
+
+
+settings = Settings()
+base_url = f"{settings.connect_server_url}/__api__/v1"
+api_key = settings.connect_api_key
+headers = {'Authorization': f'Key {api_key}'}
+```
+
+{{< pagebreak >}}
+
+## Report info
+
+Posit Connect deployment report as of **`{python} today.strftime("%B %d, %Y %H:%M:%S %Z")`**.
+
+{{< pagebreak >}}
+
+## Content
 
 ```{python}
-print("Hello world!")
+def get_all_content() -> list[dict]:
+    with httpx.Client(base_url=base_url, headers=headers) as client:
+        r = client.get('/content')
+    data = r.json()
+    if len(data) < 1:
+        raise ValueError(f"No content was found. Your API key is {api_key}. Your data is {data}")
+    return r.json()
+
+content = get_all_content()
 ```
+
+There are **`{python} f"{len(content):,}"`** items of deployed content. The breakdown of the content is as follows:
+
+::: {.content-visible when-format="html"}
+
+```{python}
+#| fig-alt: "A bar of the count of deployed content by programming language"
+
+def get_programming_language(python_version: str | None, r_version: str | None, app_mode: str) -> str:
+    if python_version and r_version:
+        return "Python and R"
+    elif python_version:
+        return "Python"
+    elif r_version:
+        return "R"
+    elif python_version is None and r_version is None and app_mode == 'static' or app_mode == 'rmd-static':
+        return "Static content"
+    else:
+        return "N/A"
+
+
+def plot_content_by_language(content: list[dict]) -> Figure:
+    df = pd.DataFrame.from_records(content)
+    df['programming_language'] = df.apply(
+        lambda x: get_programming_language(
+            x['py_version'],
+            x['r_version'],
+            x['app_mode']
+        ),
+        axis=1
+    )
+
+    summary = (
+        df
+        .value_counts(subset=['programming_language'])
+        .to_frame('count')
+        .reset_index()
+    )
+
+    fig = px.bar(
+        summary,
+        x="count",
+        y="programming_language",
+        orientation='h',
+        title="Content count by language",
+        labels={
+            "programming_language": "Programming Language(s)",
+            "count": "Number of Items",
+        },
+
+    )
+    return fig
+
+fig = plot_content_by_language(content)
+fig.show()
+```
+
+:::
+
+::: {.content-visible unless-format="html"}
+
+```{python}
+# img_bytes = fig.to_image(format="png", width=600, height=350, scale=2)
+# Image(img_bytes)
+
+if not os.path.exists("output/images"):
+    os.mkdir("output/images")
+
+fig.write_image("output/images/plot-content-by-programming-language.png", width=400, height=250, scale=1)
+```
+
+
+![](output/images/plot-content-by-programming-language.png)
+
+:::
+
+{{< pagebreak >}}
+
+## Users
+
+```{python}
+def get_all_users() -> list[dict]:
+    with httpx.Client(base_url=base_url, headers=headers) as client:
+        r = client.get('/users', params={'page_size': 500})
+    data = r.json()
+    if data['total'] == 500:
+        raise ValueError('There are more than 500 users, you need to update this function to perform pagination.')
+    return data['results']
+
+users = get_all_users()
+active_users = [i for i in users if i['locked'] is False]
+```
+
+
+There are **`{python} f"{len(active_users):,}"`** users. Below is the distribution of last activity time for active users.
+
+::: {.content-visible when-format="html"}
+
+```{python}
+#| warning: false
+
+def add_active_month_to_users(df: pd.DataFrame) -> pd.DataFrame:
+    df['active_time'] = pd.to_datetime(df['active_time'])
+    df['active_month'] = df['active_time'].dt.to_period('M').dt.to_timestamp()
+    return df
+
+
+def get_users_with_no_activity(users: list[dict]) -> pd.DataFrame:
+    df = pd.DataFrame.from_records(users)
+    df = add_active_month_to_users(df)
+    one_year_ago = pd.Timestamp(datetime.datetime.now() - datetime.timedelta(days=365))
+    df = (
+        df
+        .loc[df['active_month'] < one_year_ago]
+        .sort_values(by='active_time')
+        .reset_index()
+    )
+
+    return df[['guid', 'active_time', 'active_month']]
+
+
+def plot_last_user_login(users: list[dict]) -> Figure:
+    df = pd.DataFrame.from_records(users)
+    df = add_active_month_to_users(df)
+
+    summary = (
+        df
+        .value_counts(subset=['active_month'])
+        .to_frame('count')
+        .reset_index()
+    )
+
+    fig = px.bar(
+        summary,
+        x="active_month",
+        y="count",
+        title="Distribution of Last Activity Month",
+        labels={
+            "active_month": "Month of Last Activity",
+            "count": "Number of Users",
+        },
+
+    )
+    return fig
+
+fig = plot_last_user_login(active_users)
+fig.show()
+```
+
+:::
+
+::: {.content-visible unless-format="html"}
+
+```{python}
+# img_bytes = fig.to_image(format="png", width=600, height=350, scale=2)
+# Image(img_bytes)
+
+fig.write_image("output/images/plot-last-user-login.png", width=400, height=250, scale=1)
+```
+
+
+![](output/images/plot-last-user-login.png)
+
+:::
+
+You should consider locking users who have not logged in within the past 1 year. Here is the list of **`{python} f"{get_users_with_no_activity(active_users).shape[0]:,}"`** users who have no activity in the last 1 year.
+
+::: {.content-visible when-format="html"}
+
+```{python}
+#| warning: false
+#| column: body-outset
+df = get_users_with_no_activity(active_users)
+show(df)
+```
+
+:::
+
+::: {.content-visible unless-format="html"}
+
+```{python}
+Markdown(tabulate(df, headers=df.columns))
+```
+
+:::
