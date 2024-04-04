@@ -1,0 +1,4 @@
+- source: report.qmd
+  quarto-pub:
+    - id: 58e25fcb-d8d8-4afb-984d-2e1e62cbead8
+      url: 'https://samedwardes.quarto.pub/pycascades-2024-beautiful-reporting-with-quarto'
