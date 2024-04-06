@@ -1,5 +1,6 @@
 .env
 output/
+.cache/
 report.html
 report.docx
 report.pdf

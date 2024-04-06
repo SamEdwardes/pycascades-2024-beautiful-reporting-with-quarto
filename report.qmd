@@ -27,23 +27,23 @@ format:
 ---
 
 ```{python setup}
-# Import libraries
 import datetime
-import os
+import json
 import uuid
+from pathlib import Path
 
 import httpx
 import pandas as pd
 import plotly.express as px
 import pytz
-from tabulate import tabulate
-from itables import show
 from IPython.display import Image, Markdown
+from itables import show
 from plotly.graph_objs import Figure
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from tabulate import tabulate
 ```
 
-```{python base parameters}
+```{python}
 # Get current date and time
 today = datetime.datetime.now(pytz.timezone('America/Vancouver'))
 
@@ -59,6 +59,10 @@ settings = Settings()
 base_url = f"{settings.connect_server_url}/__api__/v1"
 api_key = settings.connect_api_key
 headers = {'Authorization': f'Key {api_key}'}
+
+# Create the required temporary directories.
+Path('.cache').mkdir(exist_ok=True)
+Path('output/images').mkdir(parents=True, exist_ok=True)
 ```
 
 {{< pagebreak >}}
@@ -73,12 +77,27 @@ Posit Connect deployment report as of **`{python} today.strftime("%B %d, %Y %H:%
 
 ```{python}
 def get_all_content() -> list[dict]:
-    with httpx.Client(base_url=base_url, headers=headers) as client:
-        r = client.get('/content')
-    data = r.json()
-    if len(data) < 1:
-        raise ValueError(f"No content was found. Your API key is {api_key}. Your data is {data}")
-    return data
+    path = Path('.cache/content.json')
+
+    # Reach from the cache if it exists
+    if path.is_file():
+        data = json.loads(path.read_text())
+        return data
+
+    # Hit the Connect API.
+    else:
+        with httpx.Client(base_url=base_url, headers=headers) as client:
+            r = client.get('/content')
+        data = r.json()
+
+        if len(data) < 1:
+            raise ValueError(f"No content was found. Your API key is {api_key}. Your data is {data}")
+
+        # Save the data to disk, just in case the internet is bad during the talk.
+        with open('.cache/content.json', 'w') as f:
+            json.dump(data, f)
+
+        return data
 
 content = get_all_content()
 ```
@@ -144,13 +163,12 @@ fig.show()
 ::: {.content-visible unless-format="html"}
 
 ```{python}
-# img_bytes = fig.to_image(format="png", width=600, height=350, scale=2)
-# Image(img_bytes)
-
-if not os.path.exists("output/images"):
-    os.mkdir("output/images")
-
-fig.write_image("output/images/plot-content-by-programming-language.png", width=400, height=250, scale=1)
+fig.write_image(
+    "output/images/plot-content-by-programming-language.png",
+    width=400,
+    height=250,
+    scale=1
+)
 ```
 
 
@@ -164,19 +182,32 @@ fig.write_image("output/images/plot-content-by-programming-language.png", width=
 
 ```{python}
 def get_all_users() -> list[dict]:
-    with httpx.Client(base_url=base_url, headers=headers) as client:
-        r = client.get('/users', params={'page_size': 500})
-    data = r.json()
-    if data['total'] == 500:
-        raise ValueError('There are more than 500 users, you need to update this function to perform pagination.')
+    path = Path('.cache/users.json')
 
-    results = data['results']
+    # Reach from the cache if it exists
+    if path.is_file():
+        results = json.loads(path.read_text())
+        return results
 
-    # Anonymize user GUIDs
-    for i in results:
-        i['guid'] = uuid.uuid4()
+    # Hit the Connect API.
+    else:
+        with httpx.Client(base_url=base_url, headers=headers) as client:
+            r = client.get('/users', params={'page_size': 500})
+        data = r.json()
+        if data['total'] == 500:
+            raise ValueError('There are more than 500 users, you need to update this function to perform pagination.')
 
-    return results
+        results = data['results']
+
+        # Anonymize user GUIDs
+        for i in results:
+            i['guid'] = str(uuid.uuid4())
+
+        # Save the data to disk, just in case the internet is bad during the talk.
+        with open('.cache/users.json', 'w') as f:
+            json.dump(results, f)
+
+        return results
 
 users = get_all_users()
 active_users = [i for i in users if i['locked'] is False]
@@ -189,7 +220,6 @@ There are **`{python} f"{len(active_users):,}"`** users. Below is the distributi
 
 ```{python}
 #| warning: false
-
 def add_active_month_to_users(df: pd.DataFrame) -> pd.DataFrame:
     df['active_time'] = pd.to_datetime(df['active_time'])
     df['active_month'] = df['active_time'].dt.to_period('M').dt.to_timestamp()
@@ -243,10 +273,12 @@ fig.show()
 ::: {.content-visible unless-format="html"}
 
 ```{python}
-# img_bytes = fig.to_image(format="png", width=600, height=350, scale=2)
-# Image(img_bytes)
-
-fig.write_image("output/images/plot-last-user-login.png", width=400, height=250, scale=1)
+fig.write_image(
+    "output/images/plot-last-user-login.png",
+    width=400,
+    height=250,
+    scale=1
+)
 ```
 
 
