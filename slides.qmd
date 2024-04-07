@@ -7,20 +7,32 @@ format: revealjs
 
 ## Posit
 
-> Our mission is to create incredible **open-source** tools for **data science**, **scientific research**, and **technical communication.**
+:::: {.columns}
 
+::: {.column width="50%"}
+> Our mission is to create incredible **open-source** tools for **data science**, **scientific research**, and **technical communication.**
+:::
+
+::: {.column width="50%"}
 We are the makers of popular open source tools like
 
 - RStudio IDE
 - Shiny for R and Python
 - Quarto
 - And much more...
+:::
+
+::::
+
+![](imgs/posit-logo.png)
 
 ## Quarto
 
 Quarto is *"an open-source scientific and technical publishing system"*.
 
 You can author your content in Markdown or Jupyter Notebooks.
+
+![](imgs/quarto-logo.png)
 
 ## Why Quarto?
 
