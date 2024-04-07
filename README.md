@@ -1,6 +1,6 @@
-# pycascades-2024-beautiful-reporting-with-quarto
+# PyCascades 2024 - Beautiful Reporting with Quarto
 
-Code related to my 2024 PyCascades Lighting Talk.
+Publish beautiful reports using Quarto and Python.
 
 - Slides: [Code](./slides.qmd) | [Published Output](https://samedwardes.quarto.pub/pycascades-2024-beautiful-reporting-with-quarto-slides/#/title-slide)
 - Example report: [Code](./report.qmd) | [Published Output](https://samedwardes.quarto.pub/pycascades-2024-beautiful-reporting-with-quarto/)
