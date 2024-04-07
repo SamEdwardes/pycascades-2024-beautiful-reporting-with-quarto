@@ -22,6 +22,9 @@ publish:
 slides:
     quarto preview slides.qmd
 
+publish-slides:
+    quarto publish slides.qmd
+
 # Open the report locally.
 open:
     open output/report.html

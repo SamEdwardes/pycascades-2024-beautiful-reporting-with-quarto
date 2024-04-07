@@ -2,6 +2,9 @@
 
 Code related to my 2024 PyCascades Lighting Talk.
 
+- Slides: [Code](./slides.qmd) | [Published Output](https://samedwardes.quarto.pub/pycascades-2024-beautiful-reporting-with-quarto-slides/#/title-slide)
+- Example report: [Code](./report.qmd) | [Published Output](https://samedwardes.quarto.pub/pycascades-2024-beautiful-reporting-with-quarto/)
+
 ## Submission
 
 Quarto is an open-source publishing system that is specifically designed for scientific and technical purposes. This system allows you to combine written content with code, similar to Jupyter Notebooks. However, unlike Jupyter Notebooks, Quarto enables you to generate many different beautiful output formats. In this lightning talk, I will demonstrate how I use Quarto and Python to automate reporting on a Kubernetes application I help manage.
