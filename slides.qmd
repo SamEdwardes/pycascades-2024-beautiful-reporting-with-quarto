@@ -1,0 +1,94 @@
+---
+title: "Beautiful Reporting with Quarto"
+author: "Sam Edwardes"
+date: 2024-04-07
+format: revealjs
+---
+
+## Posit
+
+> Our mission is to create incredible **open-source** tools for **data science**, **scientific research**, and **technical communication.**
+
+We are the makers of popular open source tools like
+
+- RStudio IDE
+- Shiny for R and Python
+- Quarto
+- And much more...
+
+## Quarto
+
+Quarto is *"an open-source scientific and technical publishing system"*.
+
+You can author your content in Markdown or Jupyter Notebooks.
+
+## Why Quarto?
+
+- 1 tool, many outputs.
+- In-line Python code.
+- Dynamic content.
+- Easily share your content with others (HTML, Posit Connect, Confluence, PDFs, and more)
+
+## Author using Jupyter Notebooks
+
+Author your documents using Jupyter Notebooks ([docs](https://quarto.org/docs/computations/python.html#jupyter-lab)).
+
+![](imgs/author-using-jupy.png)
+
+## Single page HTML
+
+You can create single page HTML files with interactive components ([docs](https://quarto.org/docs/output-formats/html-basics.html)).
+
+![](imgs/single-page-html.png)
+
+## In line Python
+
+Render Python output inline with your markdown.
+
+```markdown
+Hello `{python} user.name` it is nice to meet you.
+
+The balance of your account is `{python} f"{user.balance:,}"`.
+```
+
+> Hello Sam it is nice to meet you.
+>
+> The balance of your account is 10,100.
+
+## Email
+
+Send emails with Posit Connect and Quarto ([docs](https://quarto.org/docs/prerelease/1.4/email.html)).
+
+![](imgs/email.png)
+
+![](imgs/email-code.png)
+
+## Dashboards
+
+Create interactive dashboards ([docs](https://quarto.org/docs/dashboards/)).
+
+![](imgs/dashboards.png)
+
+## Confluence
+
+Publish directly to Confluence ([docs](https://quarto.org/docs/publishing/confluence.html)).
+
+```markdown
+---
+title: Confluence Demo
+format: confluence-html
+---
+
+Write your content in Quarto documents and publish to Confluence.
+```
+
+![](imgs/confluence.png)
+
+
+## Demo
+
+<https://github.com/SamEdwardes/pycascades-2024-beautiful-reporting-with-quarto>
+
+## Thank you
+
+Learn more at <https://quarto.org>

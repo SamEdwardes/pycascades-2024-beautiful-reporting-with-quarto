@@ -5,6 +5,8 @@ report.html
 report.docx
 report.pdf
 reoprt_files/
+slides.html
+slides_files/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

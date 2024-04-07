@@ -19,6 +19,9 @@ publish:
     rm report.html report.pdf report.docx report.ipynb
     rm -rf report_files
 
+slides:
+    quarto preview slides.qmd
+
 # Open the report locally.
 open:
     open output/report.html
@@ -31,3 +34,4 @@ uv:
 clean:
     rm -rf output .cache report_files
     rm -f report.docx report.pdf report.html report.ipynb
+    rm -rf slides_files slides.html
