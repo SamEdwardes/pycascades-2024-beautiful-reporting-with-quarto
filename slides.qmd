@@ -16,10 +16,10 @@ format: revealjs
 ::: {.column width="50%"}
 We are the makers of popular open source tools like
 
-- RStudio IDE
-- Shiny for R and Python
-- Quarto
-- And much more...
+- [RStudio IDE](https://posit.co/downloads/)
+- [Shiny](https://shiny.posit.co) for R and Python
+- [Quarto](https://quarto.org)
+- And much more... <https://posit.co>
 :::
 
 ::::
@@ -37,6 +37,7 @@ You can author your content in Markdown or Jupyter Notebooks.
 ## Why Quarto?
 
 - 1 tool, many outputs.
+- Author in Jupyter Notebooks or Markdown files.
 - In-line Python code.
 - Dynamic content.
 - Easily share your content with others (HTML, Posit Connect, Confluence, PDFs, and more)
