@@ -23,7 +23,9 @@ format:
     highlight-style: github
     execute:
       echo: false # always hide the code for Word outputs.
-  ipynb: default
+  ipynb:
+    execute:
+      echo: true
 ---
 
 ```{python setup}
@@ -104,11 +106,7 @@ content = get_all_content()
 
 There are **`{python} f"{len(content):,}"`** items of deployed content. The breakdown of the content is as follows:
 
-::: {.content-visible when-format="html"}
-
 ```{python}
-#| fig-alt: "A bar of the count of deployed content by programming language"
-
 def get_programming_language(python_version: str | None, r_version: str | None, app_mode: str) -> str:
     if python_version and r_version:
         return "Python and R"
@@ -155,6 +153,13 @@ def plot_content_by_language(content: list[dict]) -> Figure:
     return fig
 
 fig = plot_content_by_language(content)
+fig.show()
+```
+
+::: {.content-visible when-format="html"}
+
+```{python}
+#| fig-alt: "A bar of the count of deployed content by programming language"
 fig.show()
 ```
 
@@ -216,8 +221,6 @@ active_users = [i for i in users if i['locked'] is False]
 
 There are **`{python} f"{len(active_users):,}"`** users. Below is the distribution of last activity time for active users.
 
-::: {.content-visible when-format="html"}
-
 ```{python}
 #| warning: false
 def add_active_month_to_users(df: pd.DataFrame) -> pd.DataFrame:
@@ -265,6 +268,11 @@ def plot_last_user_login(users: list[dict]) -> Figure:
     return fig
 
 fig = plot_last_user_login(active_users)
+```
+
+::: {.content-visible when-format="html"}
+
+```{python}
 fig.show()
 ```
 
@@ -288,12 +296,15 @@ fig.write_image(
 
 You should consider locking users who have not logged in within the past 1 year. Here is the list of **`{python} f"{get_users_with_no_activity(active_users).shape[0]:,}"`** users who have no activity in the last 1 year.
 
+```{python}
+df = get_users_with_no_activity(active_users)
+```
+
 ::: {.content-visible when-format="html"}
 
 ```{python}
 #| warning: false
 #| column: body-outset
-df = get_users_with_no_activity(active_users)
 show(df)
 ```
 
