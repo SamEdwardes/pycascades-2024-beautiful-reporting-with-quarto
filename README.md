@@ -2,6 +2,7 @@
 
 Publish beautiful reports using Quarto and Python.
 
+- Talk on YouTube: <https://youtu.be/mtfu_D3pAlo?si=LRM-qVvOITeCtBIk&t=511>
 - Slides: [Code](./slides.qmd) | [Published Output](https://samedwardes.quarto.pub/pycascades-2024-beautiful-reporting-with-quarto-slides/#/title-slide)
 - Example report: [Code](./report.qmd) | [Published Output](https://samedwardes.quarto.pub/pycascades-2024-beautiful-reporting-with-quarto/)
 
